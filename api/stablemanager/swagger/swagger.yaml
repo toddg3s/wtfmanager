@@ -1,0 +1,1041 @@
+---
+swagger: "2.0"
+info:
+  description: "This API provides information about horses being boarded at Willow\
+    \ Tree Farm"
+  version: "1.0.0"
+  title: "Willow Tree Farm Horse Management API"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "todd@willowtree.farm"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:8080"
+basePath: "/v1"
+tags:
+- name: "horse"
+  description: "A horse being boarded at the stable"
+- name: "person"
+  description: "A person associated with a horse at the stable"
+- name: "action"
+  description: "An occurrence of some action being done for a person or horse"
+- name: "schedule"
+  description: "A pre-determined schedule for automatic actions"
+schemes:
+- "http"
+paths:
+  /horse:
+    get:
+      tags:
+      - "horse"
+      summary: "Retrieves a list of horses in the barn"
+      description: ""
+      operationId: "get_horses"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Horse"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.horse_controller"
+    post:
+      tags:
+      - "horse"
+      summary: "Adds a new horse to the barn"
+      description: ""
+      operationId: "add_horse"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Horse object to add to barn"
+        required: true
+        schema:
+          $ref: "#/definitions/Horse"
+      responses:
+        202:
+          description: "added"
+        422:
+          description: "Invalid horse data"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.horse_controller"
+    put:
+      tags:
+      - "horse"
+      summary: "Updates a horse's data"
+      description: ""
+      operationId: "update_horse"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Horse to add to barn"
+        required: true
+        schema:
+          $ref: "#/definitions/Horse"
+      responses:
+        202:
+          description: "added"
+        422:
+          description: "Invalid horse data"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.horse_controller"
+  /horse/{id}:
+    get:
+      tags:
+      - "horse"
+      summary: "Gets information for a specific horse"
+      description: ""
+      operationId: "get_horse"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Identifier of the horse"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "success"
+          schema:
+            $ref: "#/definitions/Horse"
+        404:
+          description: "horse not found"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.horse_controller"
+    delete:
+      tags:
+      - "horse"
+      summary: "Removes a horse from the barn"
+      description: ""
+      operationId: "delete_horse"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Identifier of the horse"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "success"
+        404:
+          description: "horse not found"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.horse_controller"
+  /horse/{id}/people:
+    get:
+      tags:
+      - "horse"
+      summary: "Retrieves a list of all people associated with the horse"
+      description: ""
+      operationId: "get_horse_people"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Identifier of the horse"
+        required: true
+        type: "string"
+      - name: "type"
+        in: "query"
+        description: "restricts the list to specific types of people"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Association"
+        404:
+          description: "horse not found"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.horse_controller"
+    post:
+      tags:
+      - "horse"
+      summary: "Adds a people to the horse"
+      description: ""
+      operationId: "add_horse_people"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Identifier of the horse"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "New association(s) to the horse"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/Association"
+      responses:
+        200:
+          description: "success"
+        404:
+          description: "horse not found"
+        422:
+          description: "invalid association data"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.horse_controller"
+    put:
+      tags:
+      - "horse"
+      summary: "Updates association(s)"
+      description: ""
+      operationId: "update_horse_people"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Identifier of the horse"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Updated association(s) to the horse"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/Association"
+      responses:
+        200:
+          description: "success"
+        404:
+          description: "horse not found"
+        422:
+          description: "invalid association data"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.horse_controller"
+  /horse/{id}/people/{assocId}:
+    delete:
+      tags:
+      - "horse"
+      summary: "Removes association"
+      description: ""
+      operationId: "delete_horse_person"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Identifier of the horse"
+        required: true
+        type: "string"
+      - name: "assocId"
+        in: "path"
+        description: "Identifier of the association"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "success"
+        404:
+          description: "horse or person not found"
+      x-swagger-router-controller: "stablemanager.controllers.horse_controller"
+  /horse/{id}/schedule:
+    get:
+      tags:
+      - "horse"
+      summary: "Retrieves a list of scheduled actions"
+      description: ""
+      operationId: "get_horse_schedule"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Identifier of the horse"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ScheduleSummary"
+        404:
+          description: "horse not found"
+      x-swagger-router-controller: "stablemanager.controllers.horse_controller"
+  /action:
+    get:
+      tags:
+      - "action"
+      summary: "Gets list of actions"
+      description: ""
+      operationId: "get_actions"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "horse"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "date"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "status"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ActionSummary"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.action_controller"
+    post:
+      tags:
+      - "action"
+      summary: "Adds a new action"
+      description: ""
+      operationId: "add_action"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "New action instance"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/Action"
+      responses:
+        200:
+          description: "success"
+        422:
+          description: "invalid action data"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.action_controller"
+    put:
+      tags:
+      - "action"
+      summary: "Updates an action"
+      description: ""
+      operationId: "update_action"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Updated action instance"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/Action"
+      responses:
+        200:
+          description: "success"
+        404:
+          description: "action not found"
+        422:
+          description: "invalid action data"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.action_controller"
+  /action/{id}:
+    get:
+      tags:
+      - "action"
+      summary: "Gets action data"
+      description: ""
+      operationId: "get_action"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+          schema:
+            $ref: "#/definitions/Action"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.action_controller"
+    delete:
+      tags:
+      - "action"
+      summary: "Deletes action data"
+      description: ""
+      operationId: "delete_action"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.action_controller"
+  /action/{id}/complete:
+    post:
+      tags:
+      - "action"
+      summary: "Completed an action"
+      description: ""
+      operationId: "complete_action"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "comments"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "success"
+        404:
+          description: "action not found"
+        422:
+          description: "invalid completion data"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.action_controller"
+  /action/{id}/cancel:
+    post:
+      tags:
+      - "action"
+      summary: "Cancels an action"
+      description: ""
+      operationId: "cancel_action"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "comments"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        200:
+          description: "success"
+        404:
+          description: "action not found"
+        422:
+          description: "invalid completion data"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.action_controller"
+  /schedule:
+    post:
+      tags:
+      - "schedule"
+      summary: "Adds a new schedule"
+      description: ""
+      operationId: "add_schedule"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Schedule object to add"
+        required: true
+        schema:
+          $ref: "#/definitions/Schedule"
+      responses:
+        202:
+          description: "added"
+        422:
+          description: "Invalid schedule data"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.schedule_controller"
+    put:
+      tags:
+      - "schedule"
+      summary: "Updates a schedule"
+      description: ""
+      operationId: "update_schedule"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Schedule object to update"
+        required: true
+        schema:
+          $ref: "#/definitions/Schedule"
+      responses:
+        202:
+          description: "added"
+        422:
+          description: "Invalid schedule data"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.schedule_controller"
+  /schedule/{id}:
+    get:
+      tags:
+      - "schedule"
+      summary: "Retrieves a schedule"
+      description: ""
+      operationId: "get_schedule"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Identifier of the schedule"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+          schema:
+            $ref: "#/definitions/Schedule"
+        404:
+          description: "schedule not found"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.schedule_controller"
+    delete:
+      tags:
+      - "schedule"
+      summary: "Deletes a schedule"
+      description: ""
+      operationId: "delete_schedule"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Identifier of the schedule"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+        404:
+          description: "schedule not found"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.schedule_controller"
+  /person:
+    get:
+      tags:
+      - "person"
+      summary: "Retrieves a list of people"
+      description: ""
+      operationId: "get_people"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tags"
+        in: "query"
+        description: "Restricts list to people having certain tags (comma-saprated\
+          \ list)"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Person"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.person_controller"
+    post:
+      tags:
+      - "person"
+      summary: "Adds a new person"
+      description: ""
+      operationId: "add_person"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/Person"
+      responses:
+        202:
+          description: "success"
+        422:
+          description: "invalid person data"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.person_controller"
+    put:
+      tags:
+      - "person"
+      summary: "Updates a person"
+      description: ""
+      operationId: "update_person"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/Person"
+      responses:
+        202:
+          description: "success"
+        404:
+          description: "person not found"
+        422:
+          description: "invalid person data"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.person_controller"
+  /person/{id}:
+    get:
+      tags:
+      - "person"
+      summary: "Retrieves a person"
+      description: ""
+      operationId: "get_person"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "RestrictsIdentifier of the person"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "success"
+          schema:
+            $ref: "#/definitions/Person"
+        404:
+          description: "person not found"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.person_controller"
+    delete:
+      tags:
+      - "person"
+      summary: "Removes a person"
+      description: ""
+      operationId: "delete_person"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "RestrictsIdentifier of the person"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "success"
+          schema:
+            $ref: "#/definitions/Person"
+        404:
+          description: "person not found"
+        422:
+          description: "person cannot be deleted"
+        500:
+          description: "internal error"
+      x-swagger-router-controller: "stablemanager.controllers.person_controller"
+  /person/{id}/horses:
+    get:
+      tags:
+      - "person"
+      summary: "Retrieves a list of horses associated with a person"
+      description: ""
+      operationId: "get_person_horses"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "RestrictsIdentifier of the person"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Horse"
+        404:
+          description: "person not found"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.person_controller"
+  /person/{id}/schedule:
+    get:
+      tags:
+      - "person"
+      summary: "Retrieves a list of scheduled actions"
+      description: ""
+      operationId: "get_person_schedule"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Identifier of the person"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ScheduleSummary"
+        404:
+          description: "person not found"
+        500:
+          description: "internal error"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      x-swagger-router-controller: "stablemanager.controllers.person_controller"
+definitions:
+  Person:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      phone:
+        type: "string"
+      email:
+        type: "string"
+      address:
+        type: "string"
+      tags:
+        type: "array"
+        items:
+          type: "string"
+  Association:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      horse_id:
+        type: "string"
+      horse_name:
+        type: "string"
+      person_id:
+        type: "string"
+      person_name:
+        type: "string"
+      type:
+        type: "string"
+      comments:
+        type: "string"
+  Horse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      registered_name:
+        type: "string"
+      gender:
+        type: "string"
+        enum:
+        - "stallion"
+        - "mare"
+        - "gelding"
+      birthdate:
+        type: "string"
+      breed:
+        type: "string"
+      color:
+        type: "string"
+      comments:
+        type: "string"
+  Action:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      person_id:
+        type: "string"
+      horse_id:
+        type: "string"
+      schedule_id:
+        type: "integer"
+      timestamp:
+        type: "string"
+      summary:
+        type: "string"
+      status:
+        type: "string"
+        enum:
+        - "open"
+        - "incomplete"
+        - "complete"
+        - "cancelled"
+      completed_by:
+        type: "string"
+      tags:
+        type: "array"
+        items:
+          type: "string"
+      price:
+        type: "number"
+      comments:
+        type: "string"
+  ActionSummary:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      summary:
+        type: "string"
+  Schedule:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      summary:
+        type: "string"
+      horse_id:
+        type: "string"
+      person_id:
+        type: "string"
+      period:
+        type: "string"
+        enum:
+        - "daily"
+        - "weekly"
+        - "monthly"
+        - "annually"
+        - "one-time"
+      count:
+        type: "integer"
+        format: "int32"
+      days_of_week:
+        type: "array"
+        items:
+          type: "string"
+          enum:
+          - "mon"
+          - "tue"
+          - "wed"
+          - "thu"
+          - "fri"
+          - "sat"
+          - "sun"
+      days_of_month:
+        type: "array"
+        items:
+          type: "integer"
+      time_of_day:
+        type: "string"
+      start:
+        type: "string"
+        format: "date"
+      end:
+        type: "string"
+        format: "date"
+      num_occurrences:
+        type: "integer"
+      auto_complete:
+        type: "boolean"
+      tags:
+        type: "array"
+        items:
+          type: "string"
+  ScheduleSummary:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      summary:
+        type: "string"
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
