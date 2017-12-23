@@ -1,0 +1,2 @@
+# wtfmanager
+Simple stable manager
